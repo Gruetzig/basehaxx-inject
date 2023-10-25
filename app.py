@@ -61,7 +61,7 @@ def do_save():
         return "<p>Failed to open save file</p>"
     # read original saves secure value
     with open(f"{basepath}/archive/main", "rb") as file:
-        file.seek(0x75C00)
+        file.seek(0x75E00)
         securevalue = file.read(8)
 
     # write to save
@@ -70,6 +70,13 @@ def do_save():
             file.write(otherfile.read())
         file.seek(0x75C00)
         file.write(securevalue)
+    
+    # update hashes
+    command = [f"{app.root_path}/bin/orashashfixer", f"{basepath}/archive/main"]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    print(stdout)
+    print(stderr)
     
     command = [f"{app.root_path}/bin/save3ds_fuse", "--movable", f"{basepath}/movable.sed", "--boot9", boot9loc, "--sd", f"{basepath}", "-i", f"{basepath}/archive"]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
